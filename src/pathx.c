@@ -283,6 +283,7 @@ static void func_position(struct state *state);
 static void func_count(struct state *state);
 static void func_label(struct state *state);
 static void func_regexp(struct state *state);
+static void func_regexpi(struct state *state);
 static void func_glob(struct state *state);
 static void func_int(struct state *state);
 
@@ -306,6 +307,12 @@ static const struct func builtin_funcs[] = {
     { .name = "regexp", .arity = 1, .type = T_REGEXP,
       .arg_types = arg_types_nodeset,
       .impl = func_regexp },
+    { .name = "regexpi", .arity = 1, .type = T_REGEXP,
+      .arg_types = arg_types_string,
+      .impl = func_regexpi },
+    { .name = "regexpi", .arity = 1, .type = T_REGEXP,
+      .arg_types = arg_types_nodeset,
+      .impl = func_regexpi },
     { .name = "glob", .arity = 1, .type = T_REGEXP,
       .arg_types = arg_types_string,
       .impl = func_glob },
@@ -689,7 +696,7 @@ static void func_int(struct state *state) {
 }
 
 static struct regexp *
-nodeset_as_regexp(struct info *info, struct nodeset *ns, int glob) {
+nodeset_as_regexp(struct info *info, struct nodeset *ns, int glob, int nocase) {
     struct regexp *result = NULL;
     struct regexp **rx = NULL;
     int used = 0;
@@ -702,7 +709,7 @@ nodeset_as_regexp(struct info *info, struct nodeset *ns, int glob) {
     if (used == 0) {
         /* If the nodeset is empty, make sure we produce a regexp
          * that never matches anything */
-        result = make_regexp_unescape(info, "[^\001-\7ff]", 0);
+        result = make_regexp_unescape(info, "[^\001-\7ff]", nocase);
     } else {
         if (ALLOC_N(rx, ns->used) < 0)
             goto error;
@@ -729,7 +736,7 @@ nodeset_as_regexp(struct info *info, struct nodeset *ns, int glob) {
     return result;
 }
 
-static void func_regexp_or_glob(struct state *state, int glob) {
+static void func_regexp_or_glob(struct state *state, int glob, int nocase) {
     value_ind_t vind = make_value(T_REGEXP, state);
     int r;
 
@@ -742,9 +749,9 @@ static void func_regexp_or_glob(struct state *state, int glob) {
         if (glob)
             rx = make_regexp_from_glob(state->error->info, v->string);
         else
-            rx = make_regexp_unescape(state->error->info, v->string, 0);
+            rx = make_regexp_unescape(state->error->info, v->string, nocase);
     } else if (v->tag == T_NODESET) {
-        rx = nodeset_as_regexp(state->error->info, v->nodeset, glob);
+        rx = nodeset_as_regexp(state->error->info, v->nodeset, glob, nocase);
     } else {
         assert(0);
     }
@@ -767,11 +774,15 @@ static void func_regexp_or_glob(struct state *state, int glob) {
 }
 
 static void func_regexp(struct state *state) {
-    func_regexp_or_glob(state, 0);
+    func_regexp_or_glob(state, 0, 0);
+}
+
+static void func_regexpi(struct state *state) {
+    func_regexp_or_glob(state, 0, 1);
 }
 
 static void func_glob(struct state *state) {
-    func_regexp_or_glob(state, 1);
+    func_regexp_or_glob(state, 1, 0);
 }
 
 static bool coerce_to_bool(struct value *v) {

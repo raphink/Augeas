@@ -199,7 +199,6 @@ struct expr {
         char            *ident;        /* E_VAR */
         struct {                       /* E_APP */
             const struct func *func;
-            unsigned int     arity;
             struct expr       **args;
         };
     };
@@ -1367,7 +1366,7 @@ static void check_app(struct expr *expr, struct state *state) {
     for (f=0; f < ARRAY_CARDINALITY(builtin_funcs); f++) {
         const struct func *fn = builtin_funcs + f;
         if (STRNEQ(expr->func->name, fn->name) ||
-	    expr->arity != fn->arity)
+            expr->func->arity != fn->arity)
             continue;
 
         int match = 1;
@@ -1991,7 +1990,6 @@ static void parse_function_call(struct state *state) {
         return;
     }
     expr->func = func;
-    expr->arity = nargs;
     for (int i = nargs - 1; i >= 0; i--)
         expr->args[i] = pop_expr(state);
 

@@ -38,6 +38,11 @@ let auth =
   [ Util.indent . Build.xchg /auth(enticated)?/ "auth" "auth"
   . Sep.space . store /yes|no|on|off|any/ . Util.comment_or_eol ]
 
+(* View: reset_counters *)
+let reset_counters =
+    counter "environment" . counter "method"
+  . counter "allow" . counter "allow_ip"
+
 (* View: setting *)
 let setting = list "environment" Rx.word
             | list "method" /find|search|save|destroy/
@@ -51,6 +56,7 @@ let record =
   in [ Util.indent . key "path"
       . (Sep.space . operator)?
       . Sep.space . store /[^~# \t\n][^#\n]*[^# \t\n]|[^~# \t\n]/ . Util.eol
+      . reset_counters
       . (Util.empty | Util.comment | setting)*
       . setting ]
 

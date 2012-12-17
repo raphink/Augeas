@@ -99,16 +99,16 @@ test Libvirt.lns get libvirt_conf = {
   { "listen_addr" = "192.168.0.1" }
   { }
   { "cgroup_device_acl"
-    { "/dev/null" }
-    { "/dev/full" }
-    { "/dev/zero" }
-    { "/dev/random" }
-    { "/dev/urandom" }
-    { "/dev/ptmx" }
-    { "/dev/kvm" }
-    { "/dev/kqemu" }
-    { "/dev/rtc" }
-    { "/dev/hpet" }
+    { "item" = "/dev/null" }
+    { "item" = "/dev/full" }
+    { "item" = "/dev/zero" }
+    { "item" = "/dev/random" }
+    { "item" = "/dev/urandom" }
+    { "item" = "/dev/ptmx" }
+    { "item" = "/dev/kvm" }
+    { "item" = "/dev/kqemu" }
+    { "item" = "/dev/rtc" }
+    { "item" = "/dev/hpet" }
   }
   { }
   { "#comment" = "The maximum number of concurrent client connections to allow" }

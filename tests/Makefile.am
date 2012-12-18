@@ -82,6 +82,7 @@ lens_tests =			\
   lens-ldap.sh			\
   lens-ldif.sh			\
   lens-ldso.sh			\
+  lens-libvirt.sh		\
   lens-lightdm.sh		\
   lens-limits.sh		\
   lens-login_defs.sh 	\

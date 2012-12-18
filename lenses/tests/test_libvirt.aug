@@ -89,13 +89,13 @@ cgroup_device_acl = [
 max_clients = 20
 "
 
-test Libvirt.lns get libvirt_conf = {
+test Libvirt.lns get libvirt_conf =
   { "#comment" = "This is disabled by default, uncomment this to enable it." }
-  { }
   { "listen_tcp" = "1" }
+  { }
   { "#comment" = "Override the default configuration which binds to all network" }
   { "#comment" = "interfaces. This can be a numeric IPv4/6 address, or hostname" }
-  { "#comment" = "" }
+  { }
   { "listen_addr" = "192.168.0.1" }
   { }
   { "cgroup_device_acl"
@@ -114,5 +114,3 @@ test Libvirt.lns get libvirt_conf = {
   { "#comment" = "The maximum number of concurrent client connections to allow" }
   { "#comment" = "over all sockets combined." }
   { "max_clients" = "20" }
-  { }
-}

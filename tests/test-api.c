@@ -434,6 +434,23 @@ static void testMv(CuTest *tc) {
     aug_close(aug);
 }
 
+static void testCp(CuTest *tc) {
+    struct augeas *aug;
+    int r;
+
+    aug = aug_init(root, loadpath, AUG_NO_STDINC|AUG_NO_LOAD);
+    CuAssertPtrNotNull(tc, aug);
+
+    r = aug_set(aug, "/a/b/c", "value");
+    CuAssertRetSuccess(tc, r);
+
+    r = aug_cp(aug, "/a/b/c", "/a/b/c/d");
+    CuAssertIntEquals(tc, -1, r);
+    CuAssertIntEquals(tc, AUG_ECPDESC, aug_error(aug));
+
+    aug_close(aug);
+}
+
 
 static void testRename(CuTest *tc) {
     struct augeas *aug;
@@ -597,6 +614,7 @@ int main(void) {
     SUITE_ADD_TEST(suite, testDefNodeCreateMeta);
     SUITE_ADD_TEST(suite, testNodeInfo);
     SUITE_ADD_TEST(suite, testMv);
+    SUITE_ADD_TEST(suite, testCp);
     SUITE_ADD_TEST(suite, testRename);
     SUITE_ADD_TEST(suite, testToXml);
     SUITE_ADD_TEST(suite, testTextStore);

@@ -352,10 +352,13 @@ struct tree *tree_append(struct tree *parent,
 static struct tree *tree_append_s(struct tree *parent,
                                   const char *l0, char *v) {
     struct tree *result;
-    char *l = strdup(l0);
+    char *l;
 
-    if (l == NULL)
+    if (l0 == NULL) {
         return NULL;
+    } else {
+      l = strdup(l0);
+    }
     result = tree_append(parent, l, v);
     if (result == NULL)
         free(l);

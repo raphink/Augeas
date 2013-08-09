@@ -567,12 +567,12 @@ static const struct command_def cmd_cp_def = {
     .name = "cp",
     .opts = cmd_cp_opts,
     .handler = cmd_cp,
-    .synopsis = "move a subtree",
+    .synopsis = "copy a subtree",
     .help = cmd_cp_help
 };
 
 static const struct command_def cmd_copy_def = {
-    .name = "move",
+    .name = "copy",
     .opts = cmd_cp_opts,
     .handler = cmd_cp,
     .synopsis = "copy a subtree (alias of 'cp')",

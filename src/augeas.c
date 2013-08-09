@@ -1338,7 +1338,7 @@ int aug_cp(struct augeas *aug, const char *src, const char *dst) {
         t = t->parent;
     } while (t != aug->origin);
 
-    tree_set(d, ts->value);
+    tree_set_value(td, ts->value);
     free_tree(td->children);
     td->children = NULL;
     tree_copy_rec(ts, td);

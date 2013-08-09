@@ -454,6 +454,12 @@ static void testCp(CuTest *tc) {
     // Copy recursive tree with empty label
     r = aug_cp(aug, "/files/etc/logrotate.d/rpm/rule/create", "/files/etc/logrotate.d/acpid/rule/create");
     CuAssertRetSuccess(tc, r);
+
+    // Check empty label
+    r = aug_get(aug, "/files/etc/logrotate.d/rpm/rule/create", &value);
+    CuAssertIntEquals(tc, 1, r);
+    CuAssertStrEquals(tc, NULL, value);
+
     // Check that copies are well separated
     r = aug_set(aug, "/files/etc/logrotate.d/rpm/rule/create/mode", "1234");
     CuAssertRetSuccess(tc, r);

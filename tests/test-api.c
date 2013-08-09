@@ -437,9 +437,12 @@ static void testMv(CuTest *tc) {
 static void testCp(CuTest *tc) {
     struct augeas *aug;
     int r;
+    const char *value;
 
     aug = aug_init(root, loadpath, AUG_NO_STDINC|AUG_NO_LOAD);
     CuAssertPtrNotNull(tc, aug);
+    r = aug_load(aug);
+    CuAssertRetSuccess(tc, r);
 
     r = aug_set(aug, "/a/b/c", "value");
     CuAssertRetSuccess(tc, r);
@@ -447,6 +450,21 @@ static void testCp(CuTest *tc) {
     r = aug_cp(aug, "/a/b/c", "/a/b/c/d");
     CuAssertIntEquals(tc, -1, r);
     CuAssertIntEquals(tc, AUG_ECPDESC, aug_error(aug));
+
+    // Copy recursive tree with empty label
+    r = aug_cp(aug, "/files/etc/logrotate.d/rpm/rule/create", "/files/etc/logrotate.d/acpid/rule/create");
+    CuAssertRetSuccess(tc, r);
+    // Check that copies are well separated
+    r = aug_set(aug, "/files/etc/logrotate.d/rpm/rule/create/mode", "1234");
+    CuAssertRetSuccess(tc, r);
+    r = aug_set(aug, "/files/etc/logrotate.d/acpid/rule/create/mode", "5678");
+    CuAssertRetSuccess(tc, r);
+    r = aug_get(aug, "/files/etc/logrotate.d/rpm/rule/create/mode", &value);
+    CuAssertIntEquals(tc, 1, r);
+    CuAssertStrEquals(tc, "1234", value);
+    r = aug_get(aug, "/files/etc/logrotate.d/acpid/rule/create/mode", &value);
+    CuAssertIntEquals(tc, 1, r);
+    CuAssertStrEquals(tc, "5678", value);
 
     aug_close(aug);
 }

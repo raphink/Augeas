@@ -41,7 +41,7 @@ let stanza_word = /(source|iface|auto|allow-[a-z-]+|mapping)/
 
 (* Define additional lines for multi-line stanzas *)
 let stanza_option = [  del /[ \t]*/ "   "
-                     . key  ( /[a-z_-]+/ - stanza_word )
+                     . key  ( /[a-z0-9_-]+/ - stanza_word )
                      . sep_spc
                      . sto_to_eol ]
 
@@ -106,6 +106,8 @@ let stanza_multi  = iface|mapping
 
    let lns = (comment|empty)* . (stanza_multi | stanza_single)*
 
-   let filter = incl "/etc/network/interfaces"
+   let filter = (incl "/etc/network/interfaces")
+                . (incl "/etc/network/interfaces.d/*")
+                . Util.stdexcl
 
    let xfm = transform lns filter

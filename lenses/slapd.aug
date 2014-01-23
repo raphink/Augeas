@@ -18,7 +18,6 @@ let sep         = del /[ \t\n]+/ " "
 
 let sto_to_eol  = store /([^ \t\n].*[^ \t\n]|[^ \t\n])/
 let sto_to_spc  = store /[^\\# \t\n]+/
-let sto_to_by   = store (/[^\\# \t\n]+/ - "by")
 
 let comment     = Util.comment
 let empty       = Util.empty
@@ -28,12 +27,14 @@ let empty       = Util.empty
  *************************************************************************)
 
 let access_re   = "access to"
-let who         = [ spc . label "who"     . sto_to_spc ]
-let what        = [ spc . label "what"    . sto_to_spc ]
+let control_re  = "stop" | "continue" | "break"
+let what        = [ spc . label "access"
+                  . store (/[^\\# \t\n]+/ - ("by" | control_re)) ]
 
 (* TODO: parse the control field, see man slapd.access (5) *)
-let control     = [ spc . label "control" . sto_to_by  ]
-let by          = [ sep . key "by". who . what. control? ]
+let control     = [ spc . label "control" . store control_re ]
+let by          = [ sep . key "by" . spc . sto_to_spc
+                  . what? . control? ]
 
 let access      = [ key access_re . spc. sto_to_spc . by+ . eol ]
 
@@ -133,18 +134,21 @@ let database_re = "suffix"
                 | "restrict"
                 | "rootdn"
                 | "rootpw"
-                | "suffix"
                 | "subordinate"
                 | "syncrepl rid"
                 | "updatedn"
                 | "updateref"
                 | database_hdb
 
+let database_entry =
+     let val = Quote.double_opt
+  in Build.key_value_line database_re Sep.space val
+
 let database    = [ key "database"
                   . spc
                   . sto_to_eol
                   . eol
-                  . (comment|empty|Build.key_ws_value database_re|access)* ]
+                  . (comment|empty|database_entry|access)* ]
 
 (************************************************************************
  *                              LENS

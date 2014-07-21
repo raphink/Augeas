@@ -28,15 +28,15 @@ module Properties =
   let opt_backslash    = del /([\\][ \t]*\n)?/ ""
   let entry            = /([^ \t\n:=\/!#\\]|[\\]:|[\\]=|[\\][\t ]|[\\][^\/\n])+/
 
-  let multi_line_entry =
-      [ indent . value_to_bs? . backslash ] .
-      [ indent . value_to_bs . backslash ] * .
-      [ indent . value_to_eol . eol ] . value " < multi > "
+  let multi_line_entry = counter "multi" .
+      [ indent . seq "multi" . value_to_bs? . backslash ] .
+      [ indent . seq "multi" . value_to_bs . backslash ] * .
+      [ indent . seq "multi" . value_to_eol . eol ] . value " < multi > "
 
   let multi_line_entry_ws =
-      opt_backslash .
-      [ indent . value_to_bs_ws . backslash ] + .
-      [ indent . value_to_eol . eol ] . value " < multi_ws > "
+      opt_backslash . counter "multi" .
+      [ indent . seq "multi" . value_to_bs_ws . backslash ] + .
+      [ indent . seq "multi" . value_to_eol . eol ] . value " < multi_ws > "
 
   (* define comments and properties*)
   let bang_comment     = [ label "!comment" . del /[ \t]*![ \t]*/ "! " . store /([^ \t\n].*[^ \t\n]|[^ \t\n])/ . eol ]

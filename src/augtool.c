@@ -947,9 +947,6 @@ static int main_loop(void) {
     bool get_line = true;
     bool in_interactive = false;
 
-    if (use_lua)
-        setup_lua();
-
     if (inputfile) {
         if (use_lua) {
             if (luaL_dofile(LS, inputfile)) {
@@ -1117,9 +1114,16 @@ static int run_args(int argc, char **argv) {
         strcat(line, argv[i]);
         strcat(line, " ");
     }
-    if (echo_commands)
-        printf("%s%s\n", AUGTOOL_PROMPT, line);
-    code = run_command(line);
+    if (echo_commands) {
+        if (use_lua)
+            printf("%s%s\n", AUGTOOL_LUA_PROMPT, line);
+        else
+            printf("%s%s\n", AUGTOOL_PROMPT, line);
+    }
+    if (use_lua)
+        code = luaL_loadbuffer(LS, line, strlen(line), "line") || lua_pcall(LS, 0, 0, 0);
+    else
+        code = run_command(line);
     free(line);
     if (code >= 0 && auto_save)
         if (echo_commands)
@@ -1165,6 +1169,9 @@ int main(int argc, char **argv) {
     setlocale(LC_ALL, "");
 
     parse_opts(argc, argv);
+
+    if (use_lua)
+        setup_lua();
 
     aug = aug_init(root, loadpath, flags|AUG_NO_ERR_CLOSE);
     if (aug == NULL || aug_error(aug) != AUG_NOERROR) {

@@ -35,16 +35,18 @@ autoload xfm
      The keywords reserved for block entries *)
 let block_re = "http" | "events" | "server" | "mail" | "stream"
 
-(* All block keywords, including the ones we treat specially *)
-let block_re_all = block_re | "if" | "location" | "geo" | "map"
+let block_re_other = "if" | "location" | "geo" | "map"
   | "split_clients" | "upstream"
+
+(* All block keywords, including the ones we treat specially *)
+let block_re_all = block_re | block_re_other
 
 (* View: simple
      A simple entry *)
 let simple =
-     let kw = /[A-Za-z0-9_.:-]+/ - block_re_all
+     let kw = /[A-Za-z0-9_.:-]+/ - block_re_other
   in let mask = [ label "mask" . Util.del_str "/" . store Rx.integer ]
-  in let sto = store /[^ \t\n;][^;]*/ . Sep.semicolon
+  in let sto = store /[^{ \t\n;][^;]*/ . Sep.semicolon
   in [ Util.indent . key kw . mask? . Sep.space . sto . (Util.eol|Util.comment_eol) ]
 
 let arg (name:string) (rx:regexp) =
@@ -84,7 +86,7 @@ let block_split_clients = key "split_clients"
 let block_upstream = key "upstream"
   . any_arg "#name"
 
-let block_head = key block_re
+let block_head = (label "@block" . store block_re)
   | block_if
   | block_location
   | block_geo

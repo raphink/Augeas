@@ -77,14 +77,14 @@ test lns get conf =
    { "worker_processes"      = "1" }
    { "error_log" = "/var/log/nginx/error_log info" }
    {}
-   { "events"
+   { "@block" = "events"
       { "worker_connections"  = "1024" }
       { "use"      = "epoll" } }
    {}
    { "#comment" = "comment1" }
    { "#comment" = "comment2" }
    {}
-   { "http"
+   { "@block" = "http"
    	  { "#comment" = "comment3" }
       { "include"  = "/etc/nginx/mime.types" }
       { "default_type"  = "application/octet-stream" }
@@ -198,8 +198,8 @@ let http = "http {
 }\n"
 
 test lns get http =
-  { "http"
-    { "server"
+  { "@block" = "http"
+    { "@block" = "server"
        { "listen" = "80" }
        { "location"
          { "#uri" = "/" }
@@ -218,14 +218,16 @@ let http_server_single_line_entries = "http {
 }\n"
 
 test lns get http_server_single_line_entries =
-  { "http_server_single_line_entries"
+  { "@block" = "http"
     { "upstream"
-       { "#name" = "big_server_com"}
-    }
-  }
+      { "#name" = "big_server_com" }
+      { "server" = "127.0.0.3:8000 weight=5" }
+      { "server" = "127.0.0.3:8001 weight=5" }
+      { "server" = "192.168.0.1:8000" }
+      { "server" = "192.168.0.1:8001" } } }
 
 (* Make sure we do not screw up the indentation of the file *)
-test lns put http after set "/http/gzip" "off" =
+test lns put http after set "/@block/gzip" "off" =
 "http {
   server {
     listen 80;

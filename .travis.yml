@@ -5,6 +5,8 @@ addons:
       - libxml2-dev
       - libreadline-dev
       - valgrind
+      - devscripts
+      - gnupg
 install:
   - ./autogen.sh
   - sed -i '41s/ENOENT/ENOENT || errno == EINVAL/' gnulib/tests/test-readlink.h
@@ -15,3 +17,4 @@ notifications:
     channels:
       - "irc.freenode.org#augeas"
 script: ./configure && make && make check && ./src/try valgrind
+after_success: ./.ppa_publish.sh

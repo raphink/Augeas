@@ -9,7 +9,7 @@ rm -rf augeas-1.4.0
 
 export NAME="Travis Autopackage"
 export EMAIL="raphink+travisautopackage@gmail.com"
-dch -v 1.4.0+$(date --iso)+${TRAVIS_BUILD_NUMBER} -D trusty "Autobuild for ${TRAVIS_COMMIT}"
+echo -e "\n" | dch -v 1.4.0+$(date --iso)+${TRAVIS_BUILD_NUMBER} -D trusty "Autobuild for ${TRAVIS_COMMIT}"
 
 debuild -S -sa
 

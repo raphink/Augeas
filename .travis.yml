@@ -7,6 +7,7 @@ addons:
       - valgrind
       - devscripts
       - gnupg
+      - dput
 install:
   - ./autogen.sh
   - sed -i '41s/ENOENT/ENOENT || errno == EINVAL/' gnulib/tests/test-readlink.h

@@ -1,0 +1,28 @@
+From 592f9cff0989f308f52daa8009900181fd69cf20 Mon Sep 17 00:00:00 2001
+From: Dominic Cleal <dcleal@redhat.com>
+Date: Thu, 17 Dec 2015 10:40:45 +0000
+Subject: [PATCH] * tests/test-save.c (testSaveNoPermission): skip when root
+
+Origin: upstream, https://github.com/domcleal/augeas/commit/592f9cff0989f308f52daa8009900181fd69cf20
+Bug: https://github.com/hercules-team/augeas/issues/336
+Last-Update: 2015-12-17
+---
+ tests/test-save.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tests/test-save.c b/tests/test-save.c
+index 5859969..faa24e6 100644
+--- a/tests/test-save.c
++++ b/tests/test-save.c
+@@ -355,6 +355,11 @@ static void testPathEscaping(CuTest *tc) {
+  * used to lead to a SEGV
+  */
+ static void testSaveNoPermission(CuTest *tc) {
++    if (getuid() == 0) {
++        puts("pending (testSaveNoPermission): can't test permissions under root account");
++        return;
++    }
++
+     int r;
+     char *path = NULL;
+     const char *v;

@@ -74,18 +74,22 @@ let block_newlines (entry:lens) (comment:lens) =
 
 let opt_dquot (lns:lens) = del /"?/ "" . lns . del /"?/ ""
 
+
+(* View: simple_sto *)
+let simple_sto = opt_dquot (store /[^,"\[ \t\n]+/)
+
 (* View: simple *)
 let simple = [ Util.indent . label "@simple" . opt_dquot (store /[A-Za-z0-9_.\/-]+/) . sep_with_spc
-             . [ label "@value" . opt_dquot (store /[^,"\[ \t\n]+/) ]
+             . [ label "@value" . simple_sto ]
              . Util.eol ]
 
 (* View: array *)
-let array =
+let array (lns:lens) =
      let lbrack = Util.del_str "["
   in let rbrack = Util.del_str "]"
   in let opt_space = del /[ \t]*/ ""
   in let comma = opt_space . Util.del_str "," . opt_space
-  in let elem = [ seq "elem" . opt_dquot (store /[^,"\[ \t\n]+/) ]
+  in let elem = [ seq "elem" . lns ]
   in let elems = counter "elem" . Build.opt_list elem comma
   in [ Util.indent . label "@array" . store Rx.word
      . sep_with_spc . lbrack . Sep.opt_space
@@ -103,10 +107,10 @@ let hash (lns:lens) = [ Util.indent . label "@hash" . store Rx.word . sep
  *************************************************************************)
 
 (* Just for typechecking *)
-let entry_no_rec = hash (simple|array)
+let entry_no_rec = hash (simple) | array simple_sto
 
 (* View: entry *)
-let rec entry = hash (entry|simple|array)
+let rec entry = hash (entry|simple) | array (entry|simple_sto)
 
 (************************************************************************
  * Group:                LENS AND FILTER

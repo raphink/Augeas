@@ -101,8 +101,8 @@ test Trapperkeeper.lns get config =
   {  }
   { "@hash" = "os-settings"
     { "@array" = "ruby-load-path"
-      { "1" = "/usr/lib/ruby/vendor_ruby" }
-      { "2" = "/home/foo/ruby" }
+      { "2" = "/usr/lib/ruby/vendor_ruby" }
+      { "1" = "/home/foo/ruby" }
     }
   }
   {  }
@@ -139,3 +139,12 @@ test Trapperkeeper.lns get "test: {
 }\n" =
   { "@hash" = "test"
     { "@simple" = "x/y" { "@value" = "z" } } }
+
+(* Test: Trapperkeeper.lns
+     Arrays of hashes *)
+test Trapperkeeper.lns get "rules: [
+  {
+    name: \"foo\"
+    number: 1
+  }
+]\n" = ?
